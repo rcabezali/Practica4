@@ -8,6 +8,7 @@ from .models import Library, Book, User, Loan
 # Práctica 6:
 from django.shortcuts import render, redirect
 from .forms import LibraryForm, BookForm, UserForm, LoanForm
+from django.contrib import messages
 
 
 # Gestión de Bibliotecas
@@ -228,7 +229,10 @@ def nuevo_library(request):
         form = LibraryForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "La biblioteca se ha registrado con éxito.")
             return redirect('listar_bibliotecas')
+        else:
+            messages.error(request, "Maaaal, corrige los errores en el formulario.")
     else:
         form = LibraryForm()
     return render(request, 'formulario.html', {'form': form, 'titulo': 'Nueva Biblioteca'})
@@ -240,9 +244,13 @@ def nuevo_book(request):
         if form.is_valid():
             if not form.cleaned_data.get('title'):
                 form.add_error('title', "El título no puede estar vacío")
+                messages.error(request, "El título no puede estar vacío.")
             else:
                 form.save()
+                messages.success(request, "El libro se ha registrado con éxito.")
                 return redirect('listar_libros_de_biblioteca', biblioteca_id=form.cleaned_data.get('library').id)
+        else:
+            messages.error(request, "Fatal, corrige los errores.")
     else:
         form = BookForm()
     return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Libro'})
@@ -253,7 +261,10 @@ def nuevo_user(request):
         form = UserForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "El usuario se ha registrado con éxito.")
             return redirect('listar_usuarios')
+        else:
+            messages.error(request, "Terrible, corrige los errores en el formulario.")
     else:
         form = UserForm()
     return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Usuario'})
@@ -265,9 +276,11 @@ def nuevo_loan(request):
         if form.is_valid():
             try:
                 form.save()
+                messages.success(request, "El préstamo se ha registrado con éxito.")
                 return redirect('listar_prestamos_activos')
             except Exception as e:
                 form.add_error(None, str(e))
+                messages.error(request, f"Que mal :( error al registrar el préstamo: {e}")
     else:
         form = LoanForm()
     return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Préstamo'})
