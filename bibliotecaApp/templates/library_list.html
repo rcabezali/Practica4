@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ titulo }}</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Dirección</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for biblioteca in bibliotecas %}
+    <tr>
+      <td>{{ biblioteca.id }}</td>
+      <td>{{ biblioteca.name }}</td>
+      <td>{{ biblioteca.address }}</td>
+      <td>
+        <a href="{% url 'detalle_biblioteca_web' biblioteca.id %}" class="btn btn-info btn-sm">Detalle</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="{% url 'nuevo_library' %}" class="btn btn-primary">Nueva Biblioteca</a>
+{% endblock %}

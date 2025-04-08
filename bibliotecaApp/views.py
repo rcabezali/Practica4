@@ -284,3 +284,28 @@ def nuevo_loan(request):
     else:
         form = LoanForm()
     return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Préstamo'})
+
+# Vistas extra:
+# Listar Bibliotecas
+def lista_bibliotecas_web(request):
+    if request.method == 'GET':
+        bibliotecas = Library.objects.all()
+        return render(request, 'library_list.html', {'bibliotecas': bibliotecas, 'titulo': 'Listado de Bibliotecas'})
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+# Detalle Biblioteca
+def detalle_biblioteca_web(request, biblioteca_id):
+    if request.method == 'GET':
+        try:
+            biblioteca = Library.objects.get(id=biblioteca_id)
+            libros = biblioteca.books.all()  # Gracias a related_name 'books'
+            context = {
+                'biblioteca': biblioteca,
+                'libros': libros,
+                'titulo': f'Detalle de la Biblioteca: {biblioteca.name}'
+            }
+            return render(request, 'library_detail.html', context)
+        except Library.DoesNotExist:
+            messages.error(request, "Biblioteca no encontrada")
+            return redirect('lista_bibliotecas_web')
+    return JsonResponse({"error": "Método no permitido"}, status=405)

@@ -3,7 +3,9 @@ from .views import (
     # Práctica 4: Vistas API
     registrar_biblioteca, listar_bibliotecas, detalles_biblioteca, registrar_libro, listar_libros_de_biblioteca, detalles_libro, actualizar_libro, eliminar_libro, filtrar_libros_disponibles, registrar_usuario, listar_usuarios, detalles_usuario, listar_prestamos_usuario, registrar_prestamo, listar_prestamos_activos, devolver_libro,
     # Práctica 6: Vistas web basadas en formularios
-    nuevo_library, nuevo_book, nuevo_user, nuevo_loan
+    nuevo_library, nuevo_book, nuevo_user, nuevo_loan,
+    # Práctica 6: Extras
+    lista_bibliotecas_web, detalle_biblioteca_web
 )
 
 urlpatterns = [
@@ -35,6 +37,10 @@ urlpatterns = [
     # --- Práctica 6: Interfaz Web usando formularios ---
     # Crear Biblioteca
     path('web/libraries/nuevo/', nuevo_library, name='nuevo_library'),
+    # Listar Biblioteca
+    path('web/libraries/', lista_bibliotecas_web, name='lista_bibliotecas_web'),
+    # Consultar detalles Biblioteca
+    path('web/libraries/<int:biblioteca_id>/', detalle_biblioteca_web, name='detalle_biblioteca_web'),
     # Crear Libro
     path('web/books/nuevo/', nuevo_book, name='nuevo_book'),
     # Registrar Usuario

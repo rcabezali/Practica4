@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ titulo }}</h2>
+
+<div class="mb-3">
+  <h4>Información de la Biblioteca</h4>
+  <p><strong>ID:</strong> {{ biblioteca.id }}</p>
+  <p><strong>Nombre:</strong> {{ biblioteca.name }}</p>
+  <p><strong>Dirección:</strong> {{ biblioteca.address }}</p>
+</div>
+
+<div class="mb-3">
+  <h4>Libros asociados</h4>
+  {% if libros %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Autor</th>
+          <th>ISBN</th>
+          <th>Disponible</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for libro in libros %}
+        <tr>
+          <td>{{ libro.id }}</td>
+          <td>{{ libro.title }}</td>
+          <td>{{ libro.author }}</td>
+          <td>{{ libro.isbn }}</td>
+          <td>{{ libro.available }}</td>
+          <td>
+            <a href="{% url 'detalles_libro' libro.id %}" class="btn btn-info btn-sm">Ver</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No hay libros asociados.</p>
+  {% endif %}
+</div>
+<a href="{% url 'lista_bibliotecas_web' %}" class="btn btn-secondary">Volver al listado</a>
+{% endblock %}
