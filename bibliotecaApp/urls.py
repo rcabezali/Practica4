@@ -1,12 +1,13 @@
 from django.urls import path
 from .views import (
-    registrar_biblioteca, listar_bibliotecas, detalles_biblioteca,
-    registrar_libro, listar_libros_de_biblioteca, detalles_libro, actualizar_libro, eliminar_libro, filtrar_libros_disponibles,
-    registrar_usuario, listar_usuarios, detalles_usuario, listar_prestamos_usuario,
-    registrar_prestamo, listar_prestamos_activos, devolver_libro
+    # Práctica 4: Vistas API
+    registrar_biblioteca, listar_bibliotecas, detalles_biblioteca, registrar_libro, listar_libros_de_biblioteca, detalles_libro, actualizar_libro, eliminar_libro, filtrar_libros_disponibles, registrar_usuario, listar_usuarios, detalles_usuario, listar_prestamos_usuario, registrar_prestamo, listar_prestamos_activos, devolver_libro,
+    # Práctica 6: Vistas web basadas en formularios
+    nuevo_library, nuevo_book, nuevo_user, nuevo_loan
 )
 
 urlpatterns = [
+    # --- Práctica 4: API REST (JSON) ---
     # Gestión de Bibliotecas
     path('libraries/registrar/', registrar_biblioteca, name='registrar_biblioteca'),
     path('libraries/', listar_bibliotecas, name='listar_bibliotecas'),
@@ -30,4 +31,14 @@ urlpatterns = [
     path('loans/registrar/', registrar_prestamo, name='registrar_prestamo'),
     path('loans/', listar_prestamos_activos, name='listar_prestamos_activos'),
     path('loans/<int:prestamo_id>/devolver/', devolver_libro, name='devolver_libro'),
+
+    # --- Práctica 6: Interfaz Web usando formularios ---
+    # Crear Biblioteca
+    path('web/libraries/nuevo/', nuevo_library, name='nuevo_library'),
+    # Crear Libro
+    path('web/books/nuevo/', nuevo_book, name='nuevo_book'),
+    # Registrar Usuario
+    path('web/users/nuevo/', nuevo_user, name='nuevo_user'),
+    # Registrar Préstamo
+    path('web/loans/nuevo/', nuevo_loan, name='nuevo_loan'),
 ]
