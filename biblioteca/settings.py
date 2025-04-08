@@ -55,7 +55,7 @@ ROOT_URLCONF = "biblioteca.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR/"rutadelostemplates: practica4/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

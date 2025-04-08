@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>{{ titulo }}</h2>
+  <p><strong>ID:</strong> {{ book.id }}</p>
+  <p><strong>Título:</strong> {{ book.title }}</p>
+  <p><strong>Autor:</strong> {{ book.author }}</p>
+  <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+  <p><strong>Disponible:</strong> {{ book.available }}</p>
+  <a href="{% url 'lista_books_web' %}" class="btn btn-secondary">Volver al listado</a>
+{% endblock %}

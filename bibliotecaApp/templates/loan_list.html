@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>{{ titulo }}</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Libro</th>
+        <th>Usuario</th>
+        <th>Fecha de Préstamo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for loan in loans %}
+      <tr>
+        <td>{{ loan.id }}</td>
+        <td>{{ loan.book.title }}</td>
+        <td>{{ loan.user.name }}</td>
+        <td>{{ loan.loan_date }}</td>
+        <td>
+          <a href="{% url 'devolver_loan_web' loan.id %}" class="btn btn-success btn-sm">Devolver</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

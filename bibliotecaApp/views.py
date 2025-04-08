@@ -237,7 +237,33 @@ def nuevo_library(request):
         form = LibraryForm()
     return render(request, 'formulario.html', {'form': form, 'titulo': 'Nueva Biblioteca'})
 
-# 2. Libro
+
+def lista_bibliotecas_web(request):
+    if request.method == 'GET':
+        bibliotecas = Library.objects.all()
+        return render(request, 'library_list.html', {'bibliotecas': bibliotecas, 'titulo': 'Listado de Bibliotecas'})
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
+def detalle_biblioteca_web(request, biblioteca_id):
+    if request.method == 'GET':
+        try:
+            biblioteca = Library.objects.get(id=biblioteca_id)
+            libros = biblioteca.books.all()
+            context = {
+                'biblioteca': biblioteca,
+                'libros': libros,
+                'titulo': f'Detalle de la Biblioteca: {biblioteca.name}'
+            }
+            return render(request, 'library_detail.html', context)
+        except Library.DoesNotExist:
+            messages.error(request, "Biblioteca no encontrada")
+            return redirect('lista_bibliotecas_web')
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
+# Vistas para Libros (Web)
+
 def nuevo_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
@@ -255,7 +281,63 @@ def nuevo_book(request):
         form = BookForm()
     return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Libro'})
 
-# 3. Usuario
+
+def lista_books_web(request):
+    if request.method == 'GET':
+        books = Book.objects.all()
+        return render(request, 'book_list.html', {'books': books, 'titulo': 'Listado de Libros'})
+    return render(request, 'error.html', {"error": "Método no permitido"})
+
+
+def detalle_book_web(request, book_id):
+    if request.method == 'GET':
+        try:
+            book = Book.objects.get(id=book_id)
+            return render(request, 'book_detail.html', {'book': book, 'titulo': f'Detalle del Libro: {book.title}'})
+        except Book.DoesNotExist:
+            messages.error(request, "Libro no encontrado")
+            return redirect('lista_books_web')
+    return render(request, 'error.html', {"error": "Método no permitido"})
+
+
+@csrf_exempt
+def editar_book(request, book_id):
+    try:
+        book = Book.objects.get(id=book_id)
+    except Book.DoesNotExist:
+        messages.error(request, "Libro no encontrado")
+        return redirect('lista_books_web')
+
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Libro actualizado con éxito")
+            return redirect('detalle_book_web', book_id=book.id)
+        else:
+            messages.error(request, "Corrige los errores en el formulario")
+    else:
+        form = BookForm(instance=book)
+    return render(request, 'formulario.html', {'form': form, 'titulo': 'Editar Libro'})
+
+
+@csrf_exempt
+def eliminar_book_web(request, book_id):
+    try:
+        book = Book.objects.get(id=book_id)
+    except Book.DoesNotExist:
+        messages.error(request, "Libro no encontrado")
+        return redirect('lista_books_web')
+
+    if request.method == 'POST':
+        book.delete()
+        messages.success(request, "Libro eliminado con éxito")
+        return redirect('lista_books_web')
+    return render(request, 'book_confirm_delete.html', {'book': book, 'titulo': 'Eliminar Libro'})
+
+
+# Vistas para Usuarios (Web)
+
 def nuevo_user(request):
     if request.method == 'POST':
         form = UserForm(request.POST)
@@ -269,7 +351,29 @@ def nuevo_user(request):
         form = UserForm()
     return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Usuario'})
 
-# 4. Préstamo
+
+def lista_users_web(request):
+    if request.method == 'GET':
+        users = User.objects.all()
+        return render(request, 'user_list.html', {'users': users, 'titulo': 'Listado de Usuarios'})
+    return render(request, 'error.html', {"error": "Método no permitido"})
+
+
+def detalle_user_web(request, user_id):
+    if request.method == 'GET':
+        try:
+            user = User.objects.get(id=user_id)
+            loans = user.loans.all()
+            return render(request, 'user_detail.html',
+                          {'user': user, 'loans': loans, 'titulo': f'Detalle del Usuario: {user.name}'})
+        except User.DoesNotExist:
+            messages.error(request, "Usuario no encontrado")
+            return redirect('lista_users_web')
+    return render(request, 'error.html', {"error": "Método no permitido"})
+
+
+# Vistas para Préstamos (Web)
+
 def nuevo_loan(request):
     if request.method == 'POST':
         form = LoanForm(request.POST)
@@ -280,32 +384,48 @@ def nuevo_loan(request):
                 return redirect('listar_prestamos_activos')
             except Exception as e:
                 form.add_error(None, str(e))
-                messages.error(request, f"Que mal :( error al registrar el préstamo: {e}")
+                messages.error(request, f"Error al registrar el préstamo: {e}")
+        else:
+            messages.error(request, "Corrige los errores en el formulario.")
     else:
         form = LoanForm()
     return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Préstamo'})
 
-# Vistas extra:
-# Listar Bibliotecas
-def lista_bibliotecas_web(request):
-    if request.method == 'GET':
-        bibliotecas = Library.objects.all()
-        return render(request, 'library_list.html', {'bibliotecas': bibliotecas, 'titulo': 'Listado de Bibliotecas'})
-    return JsonResponse({"error": "Método no permitido"}, status=405)
 
-# Detalle Biblioteca
-def detalle_biblioteca_web(request, biblioteca_id):
+def lista_loans_web(request):
+    if request.method == 'GET':
+        loans = Loan.objects.filter(active=True)
+        return render(request, 'loan_list.html', {'loans': loans, 'titulo': 'Listado de Préstamos Activos'})
+    return render(request, 'error.html', {"error": "Método no permitido"})
+
+
+def lista_loans_user_web(request, user_id):
     if request.method == 'GET':
         try:
-            biblioteca = Library.objects.get(id=biblioteca_id)
-            libros = biblioteca.books.all()  # Gracias a related_name 'books'
-            context = {
-                'biblioteca': biblioteca,
-                'libros': libros,
-                'titulo': f'Detalle de la Biblioteca: {biblioteca.name}'
-            }
-            return render(request, 'library_detail.html', context)
-        except Library.DoesNotExist:
-            messages.error(request, "Biblioteca no encontrada")
-            return redirect('lista_bibliotecas_web')
-    return JsonResponse({"error": "Método no permitido"}, status=405)
+            user = User.objects.get(id=user_id)
+            loans = user.loans.all()
+            return render(request, 'loan_user_history.html',
+                          {'loans': loans, 'user': user, 'titulo': f'Historial de Préstamos de {user.name}'})
+        except User.DoesNotExist:
+            messages.error(request, "Usuario no encontrado")
+            return redirect('lista_users_web')
+    return render(request, 'error.html', {"error": "Método no permitido"})
+
+
+@csrf_exempt
+def devolver_loan_web(request, prestamo_id):
+    try:
+        loan = Loan.objects.get(id=prestamo_id)
+    except Loan.DoesNotExist:
+        messages.error(request, "Préstamo no encontrado")
+        return redirect('lista_loans_web')
+
+    if request.method == 'POST':
+        loan.active = False
+        loan.return_date = timezone.now()
+        loan.save()
+        loan.book.available = True
+        loan.book.save()
+        messages.success(request, "Libro devuelto con éxito")
+        return redirect('detalle_user_web', user_id=loan.user.id)
+    return render(request, 'loan_confirm_return.html', {'loan': loan, 'titulo': 'Confirmar Devolución'})

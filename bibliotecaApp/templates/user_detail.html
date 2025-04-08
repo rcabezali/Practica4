@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>{{ titulo }}</h2>
+  <p><strong>ID:</strong> {{ user.id }}</p>
+  <p><strong>Nombre:</strong> {{ user.name }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <h3>Historial de Préstamos</h3>
+  {% if loans %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Libro</th>
+          <th>Fecha de Préstamo</th>
+          <th>Fecha de Devolución</th>
+          <th>Activo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for loan in loans %}
+        <tr>
+          <td>{{ loan.id }}</td>
+          <td>{{ loan.book.title }}</td>
+          <td>{{ loan.loan_date }}</td>
+          <td>{{ loan.return_date }}</td>
+          <td>{{ loan.active }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No hay préstamos registrados para este usuario.</p>
+  {% endif %}
+  <a href="{% url 'lista_users_web' %}" class="btn btn-secondary">Volver al listado</a>
+{% endblock %}
