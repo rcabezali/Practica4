@@ -5,6 +5,11 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from .models import Library, Book, User, Loan
 
+# Práctica 6:
+from django.shortcuts import render, redirect
+from .forms import LibraryForm, BookForm, UserForm, LoanForm
+
+
 # Gestión de Bibliotecas
 
 @csrf_exempt
@@ -214,3 +219,55 @@ def devolver_libro(request, prestamo_id):
         except KeyError:
             return JsonResponse({"error": "Datos incompletos"}, status=400)
     return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
+# Vistas práctica 6: Para crear nuevas entidades mediante formularios
+# 1. Biblioteca
+def nuevo_library(request):
+    if request.method == 'POST':
+        form = LibraryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_bibliotecas')
+    else:
+        form = LibraryForm()
+    return render(request, 'formulario.html', {'form': form, 'titulo': 'Nueva Biblioteca'})
+
+# 2. Libro
+def nuevo_book(request):
+    if request.method == 'POST':
+        form = BookForm(request.POST)
+        if form.is_valid():
+            if not form.cleaned_data.get('title'):
+                form.add_error('title', "El título no puede estar vacío")
+            else:
+                form.save()
+                return redirect('listar_libros_de_biblioteca', biblioteca_id=form.cleaned_data.get('library').id)
+    else:
+        form = BookForm()
+    return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Libro'})
+
+# 3. Usuario
+def nuevo_user(request):
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_usuarios')
+    else:
+        form = UserForm()
+    return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Usuario'})
+
+# 4. Préstamo
+def nuevo_loan(request):
+    if request.method == 'POST':
+        form = LoanForm(request.POST)
+        if form.is_valid():
+            try:
+                form.save()
+                return redirect('listar_prestamos_activos')
+            except Exception as e:
+                form.add_error(None, str(e))
+    else:
+        form = LoanForm()
+    return render(request, 'formulario.html', {'form': form, 'titulo': 'Nuevo Préstamo'})
